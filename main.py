@@ -10,15 +10,37 @@ RED = "#DC2525"
 GREEN = "#06923E"
 YELLOW = "#f7f5dd"
 FONT_NAME = "Helvetica"
-WORK_MIN = 25
+WORK_MIN = 7
 SHORT_BREAK_MIN = 5
-LONG_BREAK_MIN = 20
+LONG_BREAK_MIN = 2
+reps = 0
 
 # ---------------------------- TIMER RESET ------------------------------- # 
 
 # ---------------------------- TIMER MECHANISM ------------------------------- # 
 def start_timer():
-    count_down(1500)
+    global reps
+    work_sec = WORK_MIN
+    short_break_sec = SHORT_BREAK_MIN
+    long_break_sec = LONG_BREAK_MIN
+
+    # If it's the 8th rep:
+    if reps == 7:
+        count_down(long_break_sec)
+        timer_label.config(text="Long Break", fg = RED)
+
+    # If it's the 1st/3rd/5th/7th rep:
+    elif reps % 2 == 0:
+        count_down(work_sec)
+        timer_label.config(text= "Study Session", fg = PINK)
+
+    # If it's the 2nd/4th/6th rep:
+    else:
+        count_down(short_break_sec)
+        timer_label.config(text= "Short Break!", fg = GREEN)
+
+    reps += 1
+    print(reps)
 
 # ---------------------------- COUNTDOWN MECHANISM ------------------------------- #
 """
@@ -31,12 +53,17 @@ def count_down(count):
     count_min = math.floor(count / 60) # gives us number of minutes
     count_sec = count % 60 # remainder of seconds after we have cleanly divided by 60
     #Dynamic Typing - changing int(count_sec) to str(count_sec)
-    if count_sec == 0:
-        count_sec = "00"
+    if count_sec < 10:
+        count_sec = f"{0}{count_sec}"
+
+    if count_min < 10:
+        count_min = f"{0}{count_min}"
 
     canvas.itemconfig(timer_text, text= f"{count_min}:{count_sec}") #how to get timer text to count down? -assign timer text a variable
     if count > 0:
         window.after(1000, count_down, count - 1) #passing "hello" as input to function, or any *arg you use
+    else:
+        start_timer()
 
 # ---------------------------- UI SETUP ------------------------------- #
 window = Tk()#Creating the window
