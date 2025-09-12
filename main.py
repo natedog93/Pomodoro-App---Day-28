@@ -10,9 +10,9 @@ RED = "#DC2525"
 GREEN = "#06923E"
 YELLOW = "#f7f5dd"
 FONT_NAME = "Helvetica"
-WORK_MIN = 3
-SHORT_BREAK_MIN = 3
-LONG_BREAK_MIN = 2
+WORK_MIN = 1500
+SHORT_BREAK_MIN = 300
+LONG_BREAK_MIN = 1200
 reps = 0
 timer = None
 
@@ -20,8 +20,14 @@ timer = None
 
 def reset_timer():
     window.after_cancel(timer)
-    canvas.itemconfig(timer_text)
-    timer_label.config(text="Timer")
+    #reset the timer back to 00:00
+    timer_label.config(text ="TIMER", fg=GREEN, bg= YELLOW, highlightthickness=0, font= (FONT_NAME, 30, "bold"))
+    #reset the lable back to "Timer"
+    canvas.itemconfig(timer_text, text= "00:00")
+    #Reset Checkmarks back to 0
+    global reps #since we are modifying the constant variable reps, we need to make it global
+    reps = 0
+    checkmark_label.config(text="")
 
 
 
