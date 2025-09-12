@@ -10,12 +10,18 @@ RED = "#DC2525"
 GREEN = "#06923E"
 YELLOW = "#f7f5dd"
 FONT_NAME = "Helvetica"
-WORK_MIN = 65
-SHORT_BREAK_MIN = 5
+WORK_MIN = 3
+SHORT_BREAK_MIN = 3
 LONG_BREAK_MIN = 2
 reps = 0
+timer = None
 
 # ---------------------------- TIMER RESET ------------------------------- # 
+
+def reset_timer():
+    window.after_cancel(timer)
+    canvas.itemconfig(timer_text)
+    timer_label.config(text="Timer")
 
 
 
@@ -25,13 +31,14 @@ def start_timer():
     work_sec = WORK_MIN
     short_break_sec = SHORT_BREAK_MIN
     long_break_sec = LONG_BREAK_MIN
+    reps += 1
 
     # If it's the 8th rep:
-    if reps == 7:
+    if reps == 8:
         count_down(long_break_sec)
         timer_label.config(text="Long Break", fg = RED)
     # If it's the 1st/3rd/5th/7th rep:
-    elif reps % 2 == 0:
+    elif reps % 2 != 0:
         count_down(work_sec)
         timer_label.config(text= "Study Session", fg = PINK)
     # If it's the 2nd/4th/6th rep:
@@ -39,7 +46,6 @@ def start_timer():
         count_down(short_break_sec)
         timer_label.config(text= "Short Break!", fg = GREEN)
 
-    reps += 1
     print(reps)
 
 # ---------------------------- COUNTDOWN MECHANISM ------------------------------- #
@@ -61,11 +67,21 @@ def count_down(count):
 
     canvas.itemconfig(timer_text, text= f"{count_min:02d}:{count_sec:02d}") #how to get timer text to count down? -assign timer text a variable
     if count > 0:
-        window.after(1000, count_down, count - 1) #passing "hello" as input to function, or any *arg you use
+        global timer
+        # passing any *arg you use as input. NOTE: Local Variable
+        timer = window.after(1000, count_down, count - 1) #passing "hello" as input to function, or any *arg you use
     else:
         start_timer()
+        if reps % 2 != 0:
+            number_of_checkmarks = int(reps/2) # turning float to int so that we can times it by our checkmark str
+            checkmark_label.config(text ='✔' * number_of_checkmarks)
+        #Instructors code below:
+        # marks = ""
+        # work_sessions = math.floor(reps/2) rounding down to the nearest whole number and making int
+        # for _ in range(work_sessions):
+        #     marks += "✔"
 
-# ---------------------------- UI SETUP ------------------------------- #
+    # ---------------------------- UI SETUP ------------------------------- #
 window = Tk()#Creating the window
 window.title("Study Bitch!")
 # bg is == Background, which you can set to hexcodes above and pulled from teh color pallet website
@@ -84,14 +100,14 @@ canvas.grid(column = 1, row = 1)
 timer_label = Label(text ="TIMER", fg=GREEN, bg= YELLOW, highlightthickness=0, font= (FONT_NAME, 30, "bold"))
 timer_label.grid(column= 1, row = 0, sticky="s")
 
-checkmark_label = Label(text ="✔", fg=GREEN, bg= YELLOW, highlightthickness=0, font= (FONT_NAME, 20, "bold"))
+checkmark_label = Label(fg=GREEN, bg= YELLOW, highlightthickness=0, font= (FONT_NAME, 20, "bold"))
 checkmark_label.grid(column = 1, row = 3, sticky ="n")
 
 # Start and reset button
 start_button = Button(text="Start", command= start_timer) #don't need parenthesis at the end because we are not calling the function
 start_button.grid(column= 0, row=2, sticky= "e")
 
-reset_button = Button(text="Reset")
+reset_button = Button(text="Reset", command= reset_timer)
 reset_button.grid(column= 2, row = 2, sticky = "w")
 
 
